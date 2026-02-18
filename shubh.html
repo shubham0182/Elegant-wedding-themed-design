@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rahul & Priya | Our Forever Journey</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --gold: #b08d57;
+            --gold-light: #d4af37;
+            --cream: #fffaf0;
+            --white: #ffffff;
+            --dark: #2c2c2c;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--cream);
+            color: var(--dark);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* 3D Falling Petals Background */
+        #bg-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), 
+                        url('https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=2069') no-repeat center center/cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            clip-path: polygon(0 0, 100% 0, 100% 90%, 50% 100%, 0 90%);
+        }
+
+        .hero-content h1 {
+            font-family: 'Great Vibes', cursive;
+            font-size: clamp(4rem, 12vw, 8rem);
+            margin: 10px 0;
+            text-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .hero-content p {
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            font-size: 1.1rem;
+        }
+
+        /* 3D Location & Invite Card */
+        .card-container {
+            padding: 100px 20px;
+            display: flex;
+            justify-content: center;
+            perspective: 1500px;
+        }
+
+        .card-3d {
+            width: 100%;
+            max-width: 400px;
+            height: 550px;
+            position: relative;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%; height: 100%;
+            backface-visibility: hidden;
+            border-radius: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            border: 10px solid var(--white);
+        }
+
+        .front {
+            background: linear-gradient(135deg, var(--gold), #eddfb3);
+            color: white;
+        }
+
+        .back {
+            background: var(--white);
+            transform: rotateY(180deg);
+        }
+
+        .back h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--gold);
+            margin-bottom: 20px;
+        }
+
+        /* Map Button Interaction */
+        .map-btn {
+            background: var(--gold);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            margin-top: 30px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.3s;
+        }
+
+        .map-btn:hover {
+            transform: scale(1.05);
+            background: var(--dark);
+        }
+
+        /* Itinerary Timeline */
+        .itinerary {
+            padding: 80px 20px;
+            max-width: 800px;
+            margin: auto;
+        }
+
+        .event-row {
+            background: white;
+            margin: 20px 0;
+            padding: 25px;
+            border-radius: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-left: 5px solid var(--gold);
+            transition: 0.3s;
+        }
+
+        .event-row:hover {
+            transform: translateX(10px);
+        }
+
+        #timer {
+            font-size: 2rem;
+            font-weight: 300;
+            margin-top: 20px;
+            color: var(--gold-light);
+        }
+
+        @media (max-width: 600px) {
+            .event-row { flex-direction: column; text-align: center; gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <header class="hero">
+        <div class="hero-content" data-aos="zoom-in">
+            <p>Save The Date</p>
+            <h1>Rahul & Priya</h1>
+            <p>Feb 15, 2026 • Mumbai</p>
+            <div id="timer"></div>
+        </div>
+    </header>
+
+    <section class="card-container" data-aos="fade-up">
+        <div class="card-3d" id="tilt-card">
+            <div class="card-face front">
+                <h2 style="font-family: 'Great Vibes'; font-size: 3.5rem;">The Union</h2>
+                <hr style="width: 50px; border: 1px solid white; margin: 20px 0;">
+                <p>Welcome to our beautiful new beginning.</p>
+                <p style="margin-top: 50px; font-size: 0.8rem; opacity: 0.8;">( Hover / Tap to see Location )</p>
+            </div>
+            
+            <div class="card-face back">
+                <h3>Venue Details</h3>
+                <p><strong>Hotel Grand Palace</strong></p>
+                <p>Opp. Grant Road Station, Tardeo, Mumbai</p>
+                <p style="margin-top: 15px;">Pheras at 7:00 PM</p>
+                
+                <a href="https://www.google.com/maps/search/?api=1&query=Hotel+Grant+Palace+Mumbai" 
+                   target="_blank" class="map-btn">
+                    📍 Open in Google Maps
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="itinerary">
+        <h2 style="font-family: 'Great Vibes'; font-size: 4rem; text-align: center; color: var(--gold);">Our Events</h2>
+        
+        <div class="event-row" data-aos="fade-right">
+            <div>
+                <strong>HALDI CEREMONY</strong><br>
+                <small>14th Feb, 10:00 AM</small>
+            </div>
+            <div style="color: var(--gold);">Dress: Yellow Ethnic</div>
+        </div>
+
+        <div class="event-row" data-aos="fade-left">
+            <div>
+                <strong>SANGEET NIGHT</strong><br>
+                <small>14th Feb, 7:00 PM</small>
+            </div>
+            <div style="color: var(--gold);">Dress: Glitz & Glamour</div>
+        </div>
+
+        <div class="event-row" data-aos="fade-right" onclick="window.open('https://www.google.com/maps/search/?api=1&query=Hotel+Grand+Palace+Mumbai', '_blank')">
+            <div>
+                <strong>WEDDING & DINNER</strong><br>
+                <small>15th Feb, 6:00 PM</small>
+            </div>
+            <div style="color: var(--gold); cursor: pointer;">📍 View Venue</div>
+        </div>
+    </section>
+
+    <footer style="text-align: center; padding: 100px 20px; background: white;" data-aos="fade-up">
+        <h2 style="font-family: 'Great Vibes'; font-size: 3rem; color: var(--gold);">Waiting for You</h2>
+        <p>Your presence is our greatest gift.</p>
+        <p style="margin-top: 20px;">Contact: +91 98765 43210</p>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.0/vanilla-tilt.min.js"></script>
+
+    <script>
+        AOS.init({ duration: 1000, once: false });
+
+        // 3D Tilt Effect
+        VanillaTilt.init(document.querySelector("#tilt-card"), {
+            max: 15,
+            speed: 400,
+            glare: true,
+            "max-glare": 0.3
+        });
+
+        // Click to flip on mobile
+        const card = document.querySelector('.card-3d');
+        card.addEventListener('click', () => {
+            card.style.transform = card.style.transform === 'rotateY(180deg)' ? 'rotateY(0deg)' : 'rotateY(180deg)';
+        });
+
+        // Countdown Timer
+        const weddingDate = new Date("Feb 15, 2026 19:00:00").getTime();
+        setInterval(() => {
+            const now = new Date().getTime();
+            const gap = weddingDate - now;
+            const d = Math.floor(gap / 86400000);
+            const h = Math.floor((gap % 86400000) / 3600000);
+            const m = Math.floor((gap % 3600000) / 60000);
+            const s = Math.floor((gap % 60000) / 1000);
+            document.getElementById("timer").innerText = `${d}d ${h}h ${m}m ${s}s`;
+        }, 1000);
+
+        // Petal Animation
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const petals = [];
+        function createPetal() {
+            return {
+                x: Math.random() * canvas.width,
+                y: -20,
+                r: Math.random() * 5 + 2,
+                d: Math.random() * 1 + 0.5,
+                a: Math.random() * Math.PI
+            };
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(176, 141, 87, 0.3)';
+            if(petals.length < 50) petals.push(createPetal());
+            petals.forEach((p, i) => {
+                p.y += p.d;
+                p.x += Math.sin(p.a) * 0.5;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fill();
+                if(p.y > canvas.height) petals.splice(i, 1);
+            });
+            requestAnimationFrame(draw);
+        }
+        draw();
+    </script>
+</body>
+</html>
